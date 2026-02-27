@@ -1,1 +1,9 @@
 .venv
+
+# Python temporary files
+__pycache__/
+*.pyc
+*.pyo
+
+# Flask session files
+flask_session/

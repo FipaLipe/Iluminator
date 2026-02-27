@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+
+
+</head>
+<title>Iluminator</title>
+</head>
+
+<body
+    class="p-20 flex  flex-col md:flex-row items-center justify-center h-screen font-['JetBrains_Mono'] text-white bg-listras">
+    <a href="/" class="absolute top-10 left-10 text-md underline hover:scale-110 transition duration-300">&#8617;
+        Voltar</a>
+
+    <div id="playing" class="w-full flex  flex-col md:flex-row items-center justify-center">
+        <img src="/static/img/cassar.png" alt="Iluminator Logo"
+            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+        <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg -mt-40 md:mt-0 z-10">
+            <div class="bg-[#f2eddb] border-4 border-[#b77935] p-4 py-2 rounded-full w-full min-h-30 text-[#b76e22] text-lg text-center font-bold flex flex-col items-center justify-center mb-8"
+                id="pergunta">
+            </div>
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('SIM')">
+                Sim
+            </button>
+
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('PROVAVELMENTE_SIM')">
+                Provavelmente sim
+            </button>
+
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('NAO_SEI')">
+                Não sei
+            </button>
+
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('PROVAVELMENTE_NAO')">
+                Provavelmente não
+            </button>
+
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('NAO')">
+                Não
+            </button>
+        </div>
+    </div>
+
+
+    <div id="adivinhou" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
+        <img src="/static/img/cassar.png" alt="Iluminator Logo"
+            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+        <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg -mt-40 md:mt-0 z-10">
+            <div class="bg-[#f2eddb] border-4 border-[#b77935] p-4 py-2 rounded-full w-full min-h-30 text-[#b76e22] text-xl text-center font-bold flex flex-col items-center justify-center mb-8"
+                id="chute">
+            </div>
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('SIM')">
+                Sim
+            </button>
+
+            <button
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                onClick="enviaResposta('NAO')">
+                Não
+            </button>
+        </div>
+    </div>
+
+    <div id="vitoria" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
+        <img src="/static/img/cassar_vitoria.png" alt="Iluminator Logo"
+            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+        <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg">
+            <h1 class="text-5xl md:text-7xl text-center font-['Alfa_Slab_One'] text-shadow-lg text-outline-shadow">
+                EU VENCI!
+            </h1>
+            <h2 class="text-2xl md:text-4xl text-shadow-lg mb-10">&lt;Obrigado por jogar!&gt;</h2>
+
+            <a href="/"
+                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300 text-center">&#8617;
+                Voltar ao início</a>
+        </div>
+    </div>
+
+
+
+    <div id="derrota" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
+        <img src="/static/img/cassar_derrota.png" alt="Iluminator Logo"
+            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+        <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg">
+            <h1 class="text-5xl md:text-7xl text-center font-['Alfa_Slab_One'] text-shadow-lg text-outline-shadow">
+                QUE PENA
+            </h1>
+            <h2 class="text-2xl md:text-4xl text-shadow-lg mb-10">&lt;Não foi dessa vez...&gt;</h2>
+
+            <form onsubmit="enviaResposta(document.getElementById('inputResposta').value); return false;"
+                class="w-full flex flex-col items-center">
+                <input type="text" id="inputResposta" placeholder="Quem era seu personagem?" required
+                    class="w-full max-w-md px-4 py-2 rounded-full text-[#b76e22] text-lg text-center mb-4 border-2 border-[#b77935] focus:outline-none focus:ring-2 focus:ring-[#b77935] bg-[#f2eddb]">
+                <button
+                    class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                    type="submit">
+                    Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function mudaTextoPergunta(texto) {
+            const elementoPergunta = document.getElementById("pergunta");
+            elementoPergunta.textContent = texto;
+        }
+
+        async function mudaPergunta() {
+            const perguntaResponse = await fetch("/api/pergunta")
+
+            if (!perguntaResponse.ok) {
+                console.error("Erro ao obter a questão:", perguntaResponse.statusText);
+                mudaTextoPergunta("Erro ao obter a questão");
+                return;
+            }
+            const perguntaData = await perguntaResponse.json();
+            mudaTextoPergunta(perguntaData.pergunta);
+        };
+
+        async function iniciarJogo() {
+            const startResponse = await fetch("/api/start", { method: "POST" });
+
+            if (!startResponse.ok) {
+                console.error("Erro ao iniciar o jogo:", startResponse.statusText);
+                return;
+            }
+            mudaPergunta();
+        }
+
+        async function enviaResposta(resposta) {
+            const res = await fetch("/api/resposta", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ resposta })
+            });
+            if (!res.ok) {
+                console.error("Erro ao enviar resposta:", res.statusText);
+                return;
+            }
+
+            const data = await res.json();
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+
+            if (data.state === 'adivinhou') {
+                document.getElementById("chute").textContent = `Seu personagem é ${data.chute}?`;
+                document.getElementById("playing").classList.add("hidden");
+                document.getElementById("adivinhou").classList.remove("hidden");
+                document.getElementById("vitoria").classList.add("hidden");
+                document.getElementById("derrota").classList.add("hidden");
+            }
+            else if (data.state === 'playing') {
+                document.getElementById("playing").classList.remove("hidden");
+                document.getElementById("adivinhou").classList.add("hidden");
+                document.getElementById("vitoria").classList.add("hidden");
+                document.getElementById("derrota").classList.add("hidden");
+
+                mudaTextoPergunta(data.pergunta);
+            }
+            else if (data.state === 'derrota') {
+                document.getElementById("playing").classList.add("hidden");
+                document.getElementById("adivinhou").classList.add("hidden");
+                document.getElementById("vitoria").classList.add("hidden");
+                document.getElementById("derrota").classList.remove("hidden");
+            }
+            else if (data.state === 'vitoria') {
+                document.getElementById("playing").classList.add("hidden");
+                document.getElementById("adivinhou").classList.add("hidden");
+                document.getElementById("vitoria").classList.remove("hidden");
+                document.getElementById("derrota").classList.add("hidden");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const elementoPergunta = document.getElementById("pergunta");
+
+            iniciarJogo();
+        });
+    </script>
+</body>
+
+</html>

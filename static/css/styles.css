@@ -1,0 +1,51 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  position: relative;
+  background-image: url("/static/img/bg_papel.jpg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-listras {
+  background-image: url("/static/img/bg_listras.png");
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #000;
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.14) 72%,
+    rgba(0, 0, 0, 0.38) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.text-outline-shadow {
+  color: rgba(255, 255, 255, 0);
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #b76e22;
+  text-shadow: 3px 0px 0px #fff;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
