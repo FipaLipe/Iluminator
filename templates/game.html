@@ -19,44 +19,44 @@
 </head>
 
 <body
-    class="p-20 flex  flex-col md:flex-row items-center justify-center h-screen font-['JetBrains_Mono'] text-white bg-listras">
+    class="p-8 md:p-20 flex flex-col md:flex-row items-center justify-center w-screen h-screen font-['JetBrains_Mono'] text-white bg-listras overflow-hidden">
     <a href="/" class="absolute top-10 left-10 text-md underline hover:scale-110 transition duration-300">&#8617;
         Voltar</a>
 
     <div id="playing" class="w-full flex  flex-col md:flex-row items-center justify-center">
         <img src="/static/img/cassar.png" alt="Iluminator Logo"
-            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+            class="w-2/3 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
         <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg -mt-40 md:mt-0 z-10">
             <div class="bg-[#f2eddb] border-4 border-[#b77935] p-4 py-2 rounded-full w-full min-h-30 text-[#b76e22] text-lg text-center font-bold flex flex-col items-center justify-center mb-8"
                 id="pergunta">
                 Carregando pergunta...
             </div>
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('SIM')">
                 Sim
             </button>
 
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('PROVAVELMENTE_SIM')">
                 Provavelmente sim
             </button>
 
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('NAO_SEI')">
                 Não sei
             </button>
 
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('PROVAVELMENTE_NAO')">
                 Provavelmente não
             </button>
 
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('NAO')">
                 Não
             </button>
@@ -66,19 +66,19 @@
 
     <div id="adivinhou" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
         <img src="/static/img/cassar.png" alt="Iluminator Logo"
-            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+            class="w-2/3 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
         <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg -mt-40 md:mt-0 z-10">
             <div class="bg-[#f2eddb] border-4 border-[#b77935] p-4 py-2 rounded-full w-full min-h-30 text-[#b76e22] text-xl text-center font-bold flex flex-col items-center justify-center mb-8"
                 id="chute">
             </div>
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('SIM')">
                 Sim
             </button>
 
             <button
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                 onClick="enviaResposta('NAO')">
                 Não
             </button>
@@ -87,7 +87,7 @@
 
     <div id="vitoria" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
         <img src="/static/img/cassar_vitoria.png" alt="Iluminator Logo"
-            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+            class="w-2/3 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
         <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg">
             <h1 class="text-5xl md:text-7xl text-center font-['Alfa_Slab_One'] text-shadow-lg text-outline-shadow">
                 EU VENCI!
@@ -95,7 +95,7 @@
             <h2 class="text-2xl md:text-4xl text-shadow-lg mb-10">&lt;Obrigado por jogar!&gt;</h2>
 
             <a href="/"
-                class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300 text-center">&#8617;
+                class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300 text-center">&#8617;
                 Voltar ao início</a>
         </div>
     </div>
@@ -104,7 +104,7 @@
 
     <div id="derrota" class="w-full flex  flex-col md:flex-row items-center justify-center hidden">
         <img src="/static/img/cassar_derrota.png" alt="Iluminator Logo"
-            class="w-80 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
+            class="w-2/3 md:w-100 object-contain mb-10 animate-[float_3s_ease-in-out_infinite] hover:scale-105 transition duration-300">
         <div class="flex flex-col items-center justify-center gap-4 w-full max-w-lg">
             <h1 class="text-5xl md:text-7xl text-center font-['Alfa_Slab_One'] text-shadow-lg text-outline-shadow">
                 QUE PENA
@@ -116,7 +116,7 @@
                 <input type="text" id="inputResposta" placeholder="Quem era seu personagem?" required
                     class="w-full max-w-md px-4 py-2 rounded-full text-[#b76e22] text-lg text-center mb-4 border-2 border-[#b77935] focus:outline-none focus:ring-2 focus:ring-[#b77935] bg-[#f2eddb]">
                 <button
-                    class="w-90 px-6 py-3 bg-[#b76e22] text-white text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
+                    class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                     type="submit">
                     Enviar
                 </button>
@@ -153,6 +153,8 @@
         }
 
         async function enviaResposta(resposta) {
+            mudaTextoPergunta("Processando resposta...");
+
             const res = await fetch("/api/resposta", {
                 method: "POST",
                 headers: {

@@ -1,3 +1,5 @@
+import uuid
+
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, session, url_for
 from flask_session import Session
@@ -16,6 +18,8 @@ r = Redis(
     password=redis_password,
     decode_responses=True,
 )
+
+games_cache = {}
 
 
 # Organiza as perguntas por ordem de entropia
@@ -182,7 +186,9 @@ def start_game():
 
     perguntas = analisar_perguntas(perguntas, pessoas)
 
-    session["game"] = {
+    game_id = str(uuid.uuid4())
+
+    games_cache[game_id] = {
         "pessoas": pessoas,
         "perguntas": perguntas,
         "respostas": {},
@@ -190,12 +196,14 @@ def start_game():
         "state": "playing",
     }
 
+    session["game_id"] = game_id
+
     return {"message": "Jogo iniciado"}
 
 
 @app.route("/api/pergunta")
 def pergunta():
-    game = session["game"]
+    game = games_cache[session["game_id"]]
     if game["perguntas"]:
         return {"pergunta": game["perguntas"][0]["texto"]}
     return {"pergunta": "Nenhuma pergunta disponível"}
@@ -214,7 +222,7 @@ valores_respostas = {
 def resposta():
     data = request.json
     resposta = data.get("resposta")
-    game = session["game"]
+    game = games_cache[session["game_id"]]
 
     if game["state"] == "adivinhou":
         if resposta == "SIM":
@@ -228,7 +236,7 @@ def resposta():
                 game["pessoas"][0]["prob"] = 0
                 game["state"] = "playing"
 
-        session["game"] = game
+        games_cache[session["game_id"]] = game
         return {
             "state": game["state"],
             "pergunta": (
@@ -238,6 +246,7 @@ def resposta():
 
     if game["state"] == "derrota":
         atualizar_dados(game["respostas"], resposta)
+        games_cache.pop(session["game_id"], None)
         session.clear()
         return jsonify({"redirect": url_for("index")})
 
@@ -280,14 +289,14 @@ def resposta():
         chute = game["pessoas"][0]["nome"]
         game["state"] = "adivinhou"
 
-        session["game"] = game
+        games_cache[session["game_id"]] = game
         return {"state": "adivinhou", "chute": chute}
 
     # Checa se há perguntas disponíveis
     if len(game["perguntas"]) > 0:
-        session["game"] = game
+        games_cache[session["game_id"]] = game
         return {"state": "playing", "pergunta": game["perguntas"][0]["texto"]}
     else:
         game["state"] = "derrota"
-        session["game"] = game
+        games_cache[session["game_id"]] = game
         return {"state": "derrota"}
