@@ -1,9 +1,21 @@
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, session, url_for
 from flask_session import Session
-import pandas as pd
 import os
 from redis import Redis
+
+load_dotenv()
+
+redis_host = os.environ.get("REDIS_HOST")
+redis_port = int(os.environ.get("REDIS_PORT", 6379))
+redis_password = os.environ.get("REDIS_PASSWORD", None)
+
+r = Redis(
+    host=redis_host,
+    port=redis_port,
+    password=redis_password,
+    decode_responses=True,
+)
 
 
 # Organiza as perguntas por ordem de entropia
@@ -29,46 +41,13 @@ def analisar_pessoas(pessoas):
 
 
 def atualizar_dados(respostas, pessoa):
-    df = pd.read_excel("Dados_Iluminator.xlsx")
-    if pessoa not in df["Nome"].values:
-        nova_pessoa = {col: 0 for col in df.columns}
-        nova_pessoa["Nome"] = pessoa
-        df = pd.concat([df, pd.DataFrame([nova_pessoa])], ignore_index=True)
+    chave_pessoa = f"pessoa:{pessoa}"
+    if not r.exists(chave_pessoa):
+        inicial = {pergunta: 0 for pergunta in respostas.keys()}
+        r.hset(chave_pessoa, mapping=inicial)
 
     for pergunta_nome, valor in respostas.items():
-        df.loc[df["Nome"] == pessoa, pergunta_nome] += valor
-
-    df.to_excel("Dados_Iluminator.xlsx", index=False)
-
-
-def obter_dicionario_pessoa(df, nome_pessoa):
-    # Buscar a pessoa pelo nome
-    pessoa_df = df[df.iloc[:, 0] == nome_pessoa]
-
-    if pessoa_df.empty:
-        print(f"Pessoa '{nome_pessoa}' não encontrada!")
-        return None
-
-    # Extrair a linha da pessoa
-    row = pessoa_df.iloc[0]
-    pessoa_dict = {}
-
-    for atributo, valor in row[1:].items():  # Pula a coluna de nome
-
-        if pd.isna(valor):  # Usando pd.isna() que funciona melhor com pandas
-            pessoa_dict[atributo] = 0
-        else:
-            pessoa_dict[atributo] = float(valor)
-
-    return pessoa_dict
-
-
-def nova_pessoa(df, nome_pessoa, prob):
-    return {
-        "nome": nome_pessoa,
-        "prob": prob,
-        "atributes": obter_dicionario_pessoa(df, nome_pessoa),
-    }
+        r.hincrbyfloat(chave_pessoa, pergunta_nome, valor)
 
 
 def calcular_q1(pergunta, pessoas):
@@ -83,28 +62,7 @@ def calcular_q1(pergunta, pessoas):
     return max(q1s, q1n)
 
 
-def obter_dicionario_atributo(df, nome_atributo):
-    # Verificar se o atributo existe
-    if nome_atributo not in df.columns:
-        print(f"Atributo '{nome_atributo}' não encontrado!")
-        return None
-
-    # Criar dicionário de mapeamento
-    nomes_para_valores = {}
-
-    for _, row in df.iterrows():
-        nome = row.iloc[0]  # Primeira coluna é o nome
-        valor = row[nome_atributo]
-
-        if pd.isna(valor):  # Usando pd.isna() que funciona melhor com pandas
-            nomes_para_valores[nome] = 0
-        else:
-            nomes_para_valores[nome] = float(valor)
-
-    return nomes_para_valores
-
-
-perguntas = {
+textos_perguntas = {
     "3d": "Seu personagem é conhecido por usar impressoras 3D?",
     "22": "Seu personagem é da turma 22?",
     "23": "Seu personagem é da turma 23?",
@@ -160,21 +118,33 @@ perguntas = {
 }
 
 
-def nova_pergunta(df, nome_atributo):
+def nova_pergunta(nome_atributo, pessoas):
+    atributos = {}
+
+    for pessoa in pessoas:
+        atributos[pessoa["nome"]] = pessoa["atributes"].get(nome_atributo, 0.0)
+
     return {
         "nome": nome_atributo,
-        "texto": perguntas[str(nome_atributo)],
-        "atributes": obter_dicionario_atributo(df, nome_atributo),
+        "texto": textos_perguntas[nome_atributo],
+        "atributes": atributos,
     }
 
 
-load_dotenv()
+def carregar_pessoas():
+    pessoas = []
 
-redis_host = os.environ.get("REDIS_HOST")
-redis_port = int(os.environ.get("REDIS_PORT", 6379))
-redis_password = os.environ.get("REDIS_PASSWORD", None)
+    for chave in r.scan_iter("pessoa:*"):
+        nome = chave.split("pessoa:")[1]
+        dados = r.hgetall(chave)
+        dados.pop("Nome", None)
 
-r = Redis(host=redis_host, port=redis_port, password=redis_password)
+        atributos = {k: float(v) for k, v in dados.items()}
+
+        pessoas.append({"nome": nome, "prob": 1.0, "atributes": atributos})
+
+    return pessoas
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -204,19 +174,11 @@ def game():
 
 @app.route("/api/start", methods=["POST"])
 def start_game():
-    df = pd.read_excel("Dados_Iluminator.xlsx")
 
-    # Gerar pessoas
-    pessoas = []
-    for pessoa in df.iloc[:, 0]:
-        pessoas.append(nova_pessoa(df, pessoa, 1))
-
+    pessoas = carregar_pessoas()
     normalizar_pessoas(pessoas)
 
-    # Gerar perguntas
-    perguntas = []
-    for atributo in df.columns[1:]:
-        perguntas.append(nova_pergunta(df, atributo))
+    perguntas = [nova_pergunta(nome, pessoas) for nome in textos_perguntas]
 
     perguntas = analisar_perguntas(perguntas, pessoas)
 
