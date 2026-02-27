@@ -3,6 +3,7 @@ from flask import Flask, jsonify, render_template, request, session, url_for
 from flask_session import Session
 import pandas as pd
 import os
+from redis import Redis
 
 
 # Organiza as perguntas por ordem de entropia
@@ -169,12 +170,24 @@ def nova_pergunta(df, nome_atributo):
 
 load_dotenv()
 
+redis_host = os.environ.get("REDIS_HOST")
+redis_port = int(os.environ.get("REDIS_PORT", 6379))
+redis_password = os.environ.get("REDIS_PASSWORD", None)
+
+r = Redis(host=redis_host, port=redis_port, password=redis_password)
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_FILE_DIR"] = "./flask_session"
+
+app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_USE_SIGNER"] = True
+
+app.config["SESSION_REDIS"] = Redis(
+    host=os.environ.get("REDIS_HOST"),
+    port=int(os.environ.get("REDIS_PORT", 6379)),
+    password=os.environ.get("REDIS_PASSWORD"),
+)
 
 Session(app)
 
