@@ -246,6 +246,7 @@ def resposta():
         return jsonify({"redirect": url_for("index")})
 
     if game["state"] == "vitoria":
+        deletar_game(session["game_id"])
         return {"state": game["state"]}
 
     if not resposta:
