@@ -1,28 +1,32 @@
 import os
+import json
 
 from dotenv import load_dotenv
 import pandas as pd
-import redis
+from upstash_redis import Redis
 
 load_dotenv()
 
-redis_host = os.environ.get("REDIS_HOST")
-redis_port = int(os.environ.get("REDIS_PORT", 6379))
-redis_password = os.environ.get("REDIS_PASSWORD", None)
-
-r = redis.Redis(
-    host=redis_host,
-    port=redis_port,
-    password=redis_password,
-    decode_responses=True,
-)
+r = Redis.from_env()
 
 df = pd.read_excel("Dados_Iluminator.xlsx")
 
-for _, row in df.iterrows():
-    pessoa_nome = row["Nome"]
-    pessoa_data = row.to_dict()
+pessoas = []
 
-    r.hset(f"pessoa:{pessoa_nome}", mapping=pessoa_data)
+for _, row in df.iterrows():
+    nome = row["Nome"]
+
+    atributos = row.drop("Nome").to_dict()
+
+    atributos = {k: float(v) for k, v in atributos.items()}
+
+    pessoas.append({
+        "nome": nome,
+        "atributes": atributos
+    })
+
+r.set("dataset:pessoas", json.dumps(pessoas))
+
+print("Dataset salvo no Redis!")
 
 print("Todos os dados foram enviados para o Redis!")

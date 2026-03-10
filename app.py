@@ -2,25 +2,20 @@ import uuid
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, session, url_for
-from flask_session import Session
 import os
-from redis import Redis
+from upstash_redis import Redis
+import json
 
 load_dotenv()
 
-redis_host = os.environ.get("REDIS_HOST")
-redis_port = int(os.environ.get("REDIS_PORT", 6379))
-redis_password = os.environ.get("REDIS_PASSWORD", None)
+redis_client = Redis.from_env()
 
-r = Redis(
-    host=redis_host,
-    port=redis_port,
-    password=redis_password,
-    decode_responses=True,
-)
+def carregar_dataset():
+    data = r.get("dataset:pessoas")
+    return json.loads(data) if data else []
 
-games_cache = {}
-
+def salvar_dataset(pessoas):
+    r.set("dataset:pessoas", json.dumps(pessoas))
 
 # Organiza as perguntas por ordem de entropia
 def analisar_perguntas(perguntas, pessoas):
@@ -44,14 +39,16 @@ def analisar_pessoas(pessoas):
     return sorted(pessoas, key=lambda x: x["prob"], reverse=True)
 
 
-def atualizar_dados(respostas, pessoa):
-    chave_pessoa = f"pessoa:{pessoa}"
-    if not r.exists(chave_pessoa):
-        inicial = {pergunta: 0 for pergunta in respostas.keys()}
-        r.hset(chave_pessoa, mapping=inicial)
+def atualizar_dados(respostas, pessoa_nome):
+    pessoas = carregar_dataset()
 
-    for pergunta_nome, valor in respostas.items():
-        r.hincrbyfloat(chave_pessoa, pergunta_nome, valor)
+    for pessoa in pessoas:
+        if pessoa["nome"] == pessoa_nome:
+            for pergunta, valor in respostas.items():
+                atual = pessoa["atributes"].get(pergunta, 0)
+                pessoa["atributes"][pergunta] = atual + valor
+
+    salvar_dataset(pessoas)
 
 
 def calcular_q1(pergunta, pessoas):
@@ -136,35 +133,31 @@ def nova_pergunta(nome_atributo, pessoas):
 
 
 def carregar_pessoas():
-    pessoas = []
+    pessoas = carregar_dataset()
 
-    for chave in r.scan_iter("pessoa:*"):
-        nome = chave.split("pessoa:")[1]
-        dados = r.hgetall(chave)
-        dados.pop("Nome", None)
-
-        atributos = {k: float(v) for k, v in dados.items()}
-
-        pessoas.append({"nome": nome, "prob": 1.0, "atributes": atributos})
+    for pessoa in pessoas:
+        pessoa["prob"] = 1.0
 
     return pessoas
+
+def salvar_game(game_id, game):
+    r.set(f"game:{game_id}", json.dumps(game))
+
+
+def carregar_game(game_id):
+    data = r.get(f"game:{game_id}")
+    return json.loads(data) if data else None
+
+
+def deletar_game(game_id):
+    r.delete(f"game:{game_id}")
 
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-app.config["SESSION_TYPE"] = "redis"
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_USE_SIGNER"] = True
-
-app.config["SESSION_REDIS"] = Redis(
-    host=os.environ.get("REDIS_HOST"),
-    port=int(os.environ.get("REDIS_PORT", 6379)),
-    password=os.environ.get("REDIS_PASSWORD"),
-)
-
-Session(app)
-
+r = redis_client
+app.config["SESSION_REDIS"] = redis_client
 
 @app.route("/")
 def index():
@@ -188,7 +181,7 @@ def start_game():
 
     game_id = str(uuid.uuid4())
 
-    games_cache[game_id] = {
+    game = {
         "pessoas": pessoas,
         "perguntas": perguntas,
         "respostas": {},
@@ -198,12 +191,14 @@ def start_game():
 
     session["game_id"] = game_id
 
+    salvar_game(game_id, game)
+
     return {"message": "Jogo iniciado"}
 
 
 @app.route("/api/pergunta")
 def pergunta():
-    game = games_cache[session["game_id"]]
+    game = carregar_game(session["game_id"])
     if game["perguntas"]:
         return {"pergunta": game["perguntas"][0]["texto"]}
     return {"pergunta": "Nenhuma pergunta disponível"}
@@ -222,7 +217,7 @@ valores_respostas = {
 def resposta():
     data = request.json
     resposta = data.get("resposta")
-    game = games_cache[session["game_id"]]
+    game = carregar_game(session["game_id"])
 
     if game["state"] == "adivinhou":
         if resposta == "SIM":
@@ -236,7 +231,7 @@ def resposta():
                 game["pessoas"][0]["prob"] = 0
                 game["state"] = "playing"
 
-        games_cache[session["game_id"]] = game
+        salvar_game(session["game_id"], game)
         return {
             "state": game["state"],
             "pergunta": (
@@ -246,7 +241,7 @@ def resposta():
 
     if game["state"] == "derrota":
         atualizar_dados(game["respostas"], resposta)
-        games_cache.pop(session["game_id"], None)
+        deletar_game(session["game_id"])
         session.clear()
         return jsonify({"redirect": url_for("index")})
 
@@ -289,14 +284,17 @@ def resposta():
         chute = game["pessoas"][0]["nome"]
         game["state"] = "adivinhou"
 
-        games_cache[session["game_id"]] = game
+        salvar_game(session["game_id"], game)
         return {"state": "adivinhou", "chute": chute}
 
     # Checa se há perguntas disponíveis
     if len(game["perguntas"]) > 0:
-        games_cache[session["game_id"]] = game
+        salvar_game(session["game_id"], game)
         return {"state": "playing", "pergunta": game["perguntas"][0]["texto"]}
     else:
         game["state"] = "derrota"
-        games_cache[session["game_id"]] = game
+        salvar_game(session["game_id"], game)
         return {"state": "derrota"}
+
+if __name__ == "__main__":
+    app.run(debug=True)
