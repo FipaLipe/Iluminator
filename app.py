@@ -42,6 +42,13 @@ def analisar_pessoas(pessoas):
 def atualizar_dados(respostas, pessoa_nome):
     pessoas = carregar_dataset()
 
+    if not any(p["nome"] == pessoa_nome for p in pessoas):
+        nova_pessoa = {}
+        nova_pessoa["nome"] = pessoa_nome
+        nova_pessoa["atributes"] = {atr: 0 for atr in pessoas[0]["atributes"]}
+        # print("ADICIONADA A PESSOA ", nova_pessoa)
+        pessoas.append(nova_pessoa)
+
     for pessoa in pessoas:
         if pessoa["nome"] == pessoa_nome:
             for pergunta, valor in respostas.items():
@@ -346,4 +353,4 @@ def resposta():
         return {"state": "derrota"}
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
