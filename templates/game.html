@@ -112,10 +112,11 @@
             </h1>
             <h2 class="text-2xl md:text-4xl text-shadow-lg mb-10">&lt;Não foi dessa vez...&gt;</h2>
 
-            <form onsubmit="enviaResposta(document.getElementById('inputResposta').value); return false;"
-                class="w-full flex flex-col items-center">
-                <input type="text" id="inputResposta" placeholder="Quem era seu personagem?" required
-                    class="w-full max-w-md px-4 py-2 rounded-full text-[#b76e22] text-lg text-center mb-4 border-2 border-[#b77935] focus:outline-none focus:ring-2 focus:ring-[#b77935] bg-[#f2eddb]">
+            <form onsubmit="enviaResposta(document.getElementById('input-resposta').value); return false;"
+                class="w-full flex flex-col items-center relative">
+                <input type="text" id="input-resposta" placeholder="Quem era seu personagem?" required
+                    class="w-full max-w-md px-4 py-2 rounded-full text-[#b76e22] text-lg text-center mb-4 border-2 border-[#b77935] focus:outline-none focus:ring-2 focus:ring-[#b77935] bg-[#f2eddb]"><ul id="lista-sugestoes"></ul></input>
+                    
                 <button
                     class="w-full md:w-90 p-3 bg-[#b76e22] text-white text-md md:text-xl rounded-full shadow-lg hover:scale-105 hover:cursor-pointer hover:bg-[#cf761d] transition duration-300"
                     type="submit">
@@ -126,6 +127,8 @@
     </div>
 
     <script>
+        let pessoas = []
+
         function mudaTextoPergunta(texto) {
             const elementoPergunta = document.getElementById("pergunta");
             elementoPergunta.textContent = texto;
@@ -195,6 +198,10 @@
                 document.getElementById("adivinhou").classList.add("hidden");
                 document.getElementById("vitoria").classList.add("hidden");
                 document.getElementById("derrota").classList.remove("hidden");
+
+                if (data.pessoas) {
+                    pessoas = data.pessoas;
+                }
             }
             else if (data.state === 'vitoria') {
                 document.getElementById("playing").classList.add("hidden");
@@ -207,8 +214,44 @@
         document.addEventListener("DOMContentLoaded", function () {
             const elementoPergunta = document.getElementById("pergunta");
 
+            const elementoInputResposta = document.getElementById("input-resposta")
+            const elementoListaSugestoes = document.getElementById("lista-sugestoes")
+
+            elementoInputResposta.addEventListener("focus", () => {
+                elementoListaSugestoes.classList.remove("hidden")
+            })
+
+            elementoInputResposta.addEventListener("focusout", () => {
+                elementoListaSugestoes.classList.add("hidden")
+            })
+
+            elementoInputResposta.addEventListener("input", () => {
+                if (elementoInputResposta.value === '') {
+                    elementoListaSugestoes.replaceChildren();
+                    return
+                }
+                let top5Pessoas = pessoas
+                                    .filter(p => p.toLowerCase().startsWith(elementoInputResposta.value.toLowerCase()))
+                                    .slice(0, 5);
+
+                elementoListaSugestoes.replaceChildren();
+
+                top5Pessoas.forEach((p) => {
+                    const novoItem = document.createElement('li')
+                    novoItem.classList.add('item-sugestao')
+                    novoItem.innerText = p
+                    novoItem.addEventListener('mousedown', () => {
+                        elementoInputResposta.value = p
+                        elementoListaSugestoes.replaceChildren()
+                    })
+
+                    elementoListaSugestoes.appendChild(novoItem)
+                })
+            })
+
             iniciarJogo();
         });
+        
     </script>
 </body>
 

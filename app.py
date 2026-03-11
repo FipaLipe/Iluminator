@@ -283,7 +283,11 @@ def resposta():
             game["contador"] += 1
             if game["contador"] >= 5:
                 game["state"] = "derrota"
-                deletar_game(session["game_id"])
+                salvar_game(session["game_id"], game)
+                return {
+                    "state": game["state"],
+                    "pessoas": [p["nome"] for p in game["pessoas"]]
+                }
             else:
                 game["pessoas"][0]["prob"] = 0
                 game["state"] = "playing"
@@ -353,4 +357,5 @@ def resposta():
         return {"state": "derrota"}
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run()

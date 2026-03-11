@@ -39,6 +39,31 @@ body::before {
   text-shadow: 3px 0px 0px #fff;
 }
 
+#lista-sugestoes {
+  /* margin-top: -16px; */
+  position: absolute;
+  top: 50px;
+  width: 100%;
+}
+
+.item-sugestao {
+  background-color: rgba(255, 255, 255, 0.799);
+  border: #b76e22 2px solid;
+  border-radius: 500px;
+  width: 100%;
+  color: #000;
+  padding: 8px 24px;
+  margin-bottom: 4px;
+
+  transition: 300ms ease-in-out;
+}
+
+.item-sugestao:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+
 @keyframes float {
   0% {
     transform: translateY(0);
