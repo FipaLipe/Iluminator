@@ -188,7 +188,7 @@ def carregar_pessoas():
     return pessoas
 
 def salvar_game(game_id, game):
-    r.set(f"game:{game_id}", json.dumps(game))
+    r.set(f"game:{game_id}", json.dumps(game), ex=1800)
 
 
 def carregar_game(game_id):
@@ -198,6 +198,7 @@ def carregar_game(game_id):
 
 def deletar_game(game_id):
     r.delete(f"game:{game_id}")
+    print("DELETANDO O " + f"game:{game_id}")
 
 
 app = Flask(__name__)
@@ -270,10 +271,12 @@ def resposta():
         if resposta == "SIM":
             atualizar_dados(game["respostas"], game["pessoas"][0]["nome"])
             game["state"] = "vitoria"
+            deletar_game(session["game_id"])
         else:
             game["contador"] += 1
             if game["contador"] >= 5:
                 game["state"] = "derrota"
+                deletar_game(session["game_id"])
             else:
                 game["pessoas"][0]["prob"] = 0
                 game["state"] = "playing"
@@ -288,12 +291,10 @@ def resposta():
 
     if game["state"] == "derrota":
         atualizar_dados(game["respostas"], resposta)
-        deletar_game(session["game_id"])
         session.clear()
         return jsonify({"redirect": url_for("index")})
 
     if game["state"] == "vitoria":
-        deletar_game(session["game_id"])
         return {"state": game["state"]}
 
     if not resposta:
